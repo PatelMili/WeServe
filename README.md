@@ -1,18 +1,21 @@
 # CMPE 272 Enterprise Software Platforms
 
-###Project Team: 18 
+## Project Team: 18 
 
-###Team members:
+## Team members:
 
-####Devanshi Trivedi (013530530)
-####Kavina Desai (013784017)
-####Mili Patel (013756223)
-####Reeya Vani (013748917)
+###### Devanshi Trivedi (013530530)
+
+###### Kavina Desai (013784017)
+
+###### Mili Patel (013756223)
+
+###### Reeya Vani (013748917)
 
 
 
 
-###**Project Idea 1**
+## **Project Idea 1**
 
 Project title: Health Monitoring and Risk factor
 
@@ -30,7 +33,7 @@ If a particular ailment is selected(like blood pressure, cholesterol etc.), the 
 
 
 
-###**Project Idea 2**
+## **Project Idea 2**
 
 Project title: Restaurant cuisine recommender
 
@@ -48,7 +51,7 @@ The data containing food preferences along with its respective areas will be sub
 
 
 
-###**Project Idea 3**
+## **Project Idea 3**
 
 Project title: Safe location provider for residence
 
