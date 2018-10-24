@@ -17,7 +17,7 @@
 
 ## **Project Idea 1**
 
-Project title: Health Monitoring and Risk factor
+Project title: Health Monitoring and Risk factor calculation
 
 Project description:
 
