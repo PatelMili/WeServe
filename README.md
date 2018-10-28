@@ -1,6 +1,6 @@
 # CMPE 272 Enterprise Software Platforms
 
-## Project Team: 18 
+## Project Team: 18 - None of your projects approved, submit another 2 ideas 
 
 ## Team members:
 
