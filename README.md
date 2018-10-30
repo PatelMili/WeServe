@@ -12,8 +12,39 @@
 
 ###### Reeya Vani (013748917)
 
+## New ideas for reconsidreation
+
+## **Project Idea 1**
+
+**Project title** : Product Price Suggestion
+
+**Project description** :
+
+As it is considerably hard to predict how much something is worth, dealer’s need to set the prices of products considering every small detail like quality, brand name, condition of the product and so on, in deciding it’s price. The dealers must ensure that the customers feel that the product they are buying is worth the price.
+
+Our aim for this project is to predict and suggest the prices of products to the dealer selling them online as it is necessary to set the price in such a manner that the customers would not hesitate to pay for it.
+
+**Proposed methodology** :
+
+In this project, **using machine learning algorithms**, we will train a model using a dataset consisting of details like product category, name, brand name and item condition to predict the price of the product which the dealer wants to launch. By doing this, setting the price for different products will become easy for large scale industries.
+
+## **Project Idea 2**
+
+**Project title** : WeServe - connecting NGOs to pro-bono and student volunteers
+
+**Project description** :
+
+In the preliminary stage when a NGO is just started, they need a lot of technical help, consulting and advising.  These NGOs do not know what resources  to apply and which best practices to adopt. They often start with paper based system and manual task which becomes tedious. Our aim is to build a platform where people and NGOs can connect for a noble cause.
+
+**Proposed methodology** :
+
+We intend to design a platform which would connect NGOs all around and pro-bono consultants and student volunteers who can be of some assistance to the NGO. NGOs registers itself on the platform and list the requirements that they are looking for or the kind of help they are in need of. Similarly pro-bono consultants and student volunteers registers themselves on the platform and they create their profiles where they specify area of expertise, kinds of task they are willing to do, timeline they can allocate for the work etc. We would match and connect the NGOs with student volunteers and pro-bonos using **intelligent machine learning algorithms** where we will provide recommendations of the appropriate people to the NGOs by clustering them together. The platform can be builts using **Nodejs and Reactjs**. For the **scalability of the server**, we intend to use **Kafka**.  
 
 
+
+
+
+## Old Ideas
 
 ## **Project Idea 1**
 
