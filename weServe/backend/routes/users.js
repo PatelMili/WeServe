@@ -75,4 +75,93 @@ var user = new UserInfo({
 
 });
 
+/*login  */
+router.post('/login', async function (req, res, next) {
+
+  console.log('\n\nIn user login');
+  console.log("Request Got: ", req.body)
+  const username = req.body.username;
+  const type = req.body.type
+  const pwd = req.body.pwd;
+
+
+  UserInfo.findOne({
+      username: username
+  }, function (err, user) {
+      if (err) {
+          console.log("error occured")
+          // callback(err, "login failed");
+          // console.log("Some error in sql query", err.sqlMessage)
+          res.writeHead(400, {
+              'Content-Type': 'application/json'
+          })
+
+          res.end("some error in sql query")
+
+      } else if (user && bcrypt.compareSync(pwd, user.password) && user.type == type) {
+          console.log("login successfull")
+          console.log("Successfully Logged In")
+          console.log("_____________user__________________-", user)
+          res.writeHead(200, {
+              'Content-Type': 'application/json'
+          })
+          const data = {
+              "status": 1,
+              "msg": "Successfully Logged In",
+              "info": {
+                  "fullname": user.fname + " " + user.lname,
+                  "email": user.email,
+                  "username": username,
+                  "type": user.type
+              }
+          }
+          console.log("data being sent to frontend:\n", JSON.stringify(data))
+          res.end(JSON.stringify(data))
+
+      } else if ((user && user.type == type)) {
+          //password doesn't match
+          console.log("Password doesn't match!")
+
+          res.writeHead(200, {
+              'Content-Type': 'application/json'
+          })
+          const data = {
+              "status": 0,
+              "msg": "Error in login,Incorrect  password",
+              "info": {}
+          }
+          console.log("data being sent to frontend:\n", JSON.stringify(data))
+          res.end(JSON.stringify(data))
+
+      } else if ((user && bcrypt.compareSync(pwd, user.password))) {
+          console.log("type doesn't match");
+          res.writeHead(200, {
+              'Content-Type': 'application/json'
+          })
+          const data = {
+              "status": 0,
+              "msg": "Error in login,Incorrect  type",
+              "info": {}
+          }
+          console.log("data being sent to frontend:\n", JSON.stringify(data))
+          res.end(JSON.stringify(data))
+
+      }else{
+          console.log("incorrect username!");
+          res.writeHead(200, {
+              'Content-Type': 'application/json'
+          })
+          const data = {
+              "status": 0,
+              "msg": "Error in login,Incorrect  username",
+              "info": {}
+          }
+          console.log("data being sent to frontend:\n", JSON.stringify(data))
+          res.end(JSON.stringify(data))
+      }
+  })
+
+ 
+});
+
 module.exports = router;
