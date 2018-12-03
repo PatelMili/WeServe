@@ -1,0 +1,22 @@
+.textCenter{
+    
+    font-family: serif;
+    align-content: center;
+}
+.greyBackground{
+    
+    background-color: #edffec;
+    height: 100vh; 
+    text-align: center; 
+}
+.infoPadding{
+    text-align: center;
+}
+.joinUsButton{
+    color: black;
+    background-color: green;
+    border: none;
+    width: 20%;
+    height: 6vh;
+    
+}
