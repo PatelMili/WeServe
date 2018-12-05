@@ -10,12 +10,17 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cities": "^2.0.0",
+    "city-to-coords": "^1.1.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
+    "geo-distance": "^0.2.0",
+    "geolib": "^2.0.24",
     "jade": "^1.11.0",
     "kafka-node": "^3.0.1",
     "mongoose": "^5.3.14",
     "morgan": "^1.9.1",
-    "mysql": "^2.16.0"
+    "mysql": "^2.16.0",
+    "weather-js": "^2.0.0"
   }
 }

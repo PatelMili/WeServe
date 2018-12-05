@@ -20,12 +20,24 @@ var opportunity= mongoose.Schema({
         type:String
     },
     start_date:{
-        type:String
+        type:Date
     },
     end_date:{
-        type:String
+        type:Date
     },
     hrs:{
+        type:Number
+    },
+    lat:{
+        type:String
+    },
+    long:{
+        type:String
+    },
+    lat_long_flag:{
+        type:Number
+    },
+    rating:{
         type:Number
     },
     location:{

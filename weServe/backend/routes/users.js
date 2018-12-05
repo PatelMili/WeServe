@@ -5,13 +5,17 @@ var mysql = require('mysql')
 var mongoose = require('mongoose');
 var kafka = require('../kafka/client');
 
-
 //var { User } = require('../models/userInfo');
 var bcrypt = require('bcryptjs')
 var UserInfo = require('../models/userInfo').users
+var Opportunity = require('../models/opportunity')
 
-/* User Sign up */
-router.post('/', async function (req, res, next) {
+var weather = require('weather-js');
+var Distance = require('geo-distance');
+var getCoords = require('city-to-coords');
+
+/* Volunteer Sign up */
+router.post('/volunteer/signup', async function (req, res, next) {
 
     console.log('\n\nIn user signup');
     console.log("Request Got: ", req.body)
@@ -21,6 +25,12 @@ router.post('/', async function (req, res, next) {
     const lastName = req.body.lname
     const type = req.body.type
     const username = req.body.username
+    const city = req.body.city
+    const cause = req.body.cause
+    const age = req.body.age
+    const gender = req.body.gender
+    // const lat=req.body.lat
+    // const long = req.body.long
 
     //mongo query here
     var user = new UserInfo({
@@ -29,7 +39,11 @@ router.post('/', async function (req, res, next) {
         type: type,
         email: email,
         password: pwd,
-        username: username
+        username: username,
+        city: city,
+        cause: cause,
+        age: age,
+        gender: gender
     })
     console.log(`user ${user}`);
 
@@ -74,6 +88,153 @@ router.post('/', async function (req, res, next) {
     })
 
 });
+/**
+ * NGO Signup
+ */
+router.post('/ngo/signup', async function (req, res, next) {
+
+    console.log('\n\nIn user signup');
+    console.log("Request Got: ", req.body)
+    const email = req.body.email
+    const pwd = bcrypt.hashSync(req.body.pwd, 10)
+    const type = req.body.type
+    const username = req.body.username
+    const city = req.body.city
+    const cause = req.body.cause
+    const organisation_name = req.body.organisation_name;
+    const contact_person = req.body.contact_person
+    const description = req.body.description
+    const mission = req.body.mission
+    const vision = req.body.vision
+
+
+    // const lat=req.body.lat
+    // const long = req.body.long
+
+    //mongo query here
+    var user = new UserInfo({
+
+        type: type,
+        email: email,
+        password: pwd,
+        username: username,
+        city: city,
+        cause: cause,
+        organisation_name: organisation_name,
+        contact_person: contact_person,
+        description: description,
+        mission: mission,
+        vision: vision
+    })
+    console.log(`user ${user}`);
+
+    user.save().then(user => {
+        console.log("user created in mongo");
+        // console.log(`user in then is ${user}`);
+
+        res.writeHead(200, {
+            'Content-Type': 'application/json'
+        })
+        const data = {
+            "status": 1,
+            "msg": "Successfully Signed Up",
+            "info": {
+                "id": user._id,
+                "fullname": user.fname + " " + user.lname,
+                "username": user.username,
+                "type": type,
+                "email": email
+            }
+        }
+        console.log("data being sent to frontend:\n", JSON.stringify(data))
+        res.end(JSON.stringify(data))
+
+
+    }, (err) => {
+        console.log("__________err_______8787878____", err)
+        console.log(`Signup Failed in mongo`);
+        console.log("User already exists ", err.errmsg)
+        res.writeHead(200, {
+            'Content-Type': 'application/json'
+        })
+        const data = {
+            "status": 0,
+            "msg": err.message,
+            "info": {
+                "error": err.message
+            }
+        }
+        console.log("data being sent to frontend:\n", JSON.stringify(data))
+        res.end(JSON.stringify(data))
+    })
+
+});
+
+
+// /* User Google login */
+// router.post('/google/login', async function (req, res, next) {
+
+//     console.log('\n\nIn user signup');
+//     console.log("Request Got: ", req.body)
+//     const email = req.body.email
+//     const pwd = bcrypt.hashSync(req.body.pwd, 10)
+//     const firstName = req.body.fname
+//     const lastName = req.body.lname
+//     const type = req.body.type
+//     const username = req.body.username
+
+//     //mongo query here
+//     var user = new UserInfo({
+//         fname: firstName,
+//         lname: lastName,
+//         type: type,
+//         email: email,
+//         password: pwd,
+//         username: username
+//     })
+//     console.log(`user ${user}`);
+
+//     user.save().then(user => {
+//         console.log("user created in mongo");
+//         // console.log(`user in then is ${user}`);
+
+//         res.writeHead(200, {
+//             'Content-Type': 'application/json'
+//         })
+//         const data = {
+//             "status": 1,
+//             "msg": "Successfully Signed Up",
+//             "info": {
+//                 "id": user._id,
+//                 "fullname": user.fname + " " + user.lname,
+//                 "username": user.username,
+//                 "type": type,
+//                 "email": email
+//             }
+//         }
+//         console.log("data being sent to frontend:\n", JSON.stringify(data))
+//         res.end(JSON.stringify(data))
+
+
+//     }, (err) => {
+//         console.log("__________err_______8787878____", err)
+//         console.log(`Signup Failed in mongo`);
+//         console.log("User already exists ", err.errmsg)
+//         res.writeHead(200, {
+//             'Content-Type': 'application/json'
+//         })
+//         const data = {
+//             "status": 0,
+//             "msg": err.message,
+//             "info": {
+//                 "error": err.message
+//             }
+//         }
+//         console.log("data being sent to frontend:\n", JSON.stringify(data))
+//         res.end(JSON.stringify(data))
+//     })
+
+// });
 
 /*login  */
 router.post('/login', async function (req, res, next) {
@@ -160,19 +321,17 @@ router.put('/:userId/profile_information', async function (req, res, next) {
     const userId = req.params.userId;
 
     console.log("________req for user id__________", userId)
-    const mobile_no = req.body.mobile_no;
+
     const fname = req.body.fname
     const lname = req.body.lname
     const gender = req.body.gender
-    const birthdate = req.body.birthdate
     const country = req.body.country
     const city = req.body.city
-    const profession = req.body.profession
-    const interested_in = req.body.interested_in
     const cause = req.body.causes
-    const skill = req.body.skills
-    const language = req.body.languages
-    const hear_about_us = req.body.hear_about_us
+    const age = req.body.age
+
+
+    const username = req.body.username;
 
     UserInfo.update(
         { "_id": userId },
@@ -181,16 +340,14 @@ router.put('/:userId/profile_information', async function (req, res, next) {
                 "fname": fname,
                 "lname": lname,
                 "gender": gender,
-                "birthdate": birthdate,
                 "country": country,
                 "city": city,
-                "profession": profession,
-                "interested_in": interested_in,
                 "causes": cause,
                 "skills": skill,
                 "languages": language,
                 "hear_about_us": hear_about_us,
-                "mobile_no": mobile_no
+                "mobile_no": mobile_no,
+                "username": username
             },
         }, function (err, result) {
             if (err) {
@@ -328,7 +485,7 @@ router.get('/:userId/ngo_detail', function (req, res) {
     console.log("inside the get request for ngo details")
 
     const userId = req.params.userId
-    console.log("_________userId___________",userId)
+    console.log("_________userId___________", userId)
     UserInfo.findById(userId)
         .then(userInfo => {
             res.writeHead(200, {
@@ -367,7 +524,7 @@ router.get('/:userId/volunteer_detail', function (req, res) {
     console.log("inside the get request for volunteer details")
 
     const userId = req.params.userId
-    console.log("_________userId___________",userId)
+    console.log("_________userId___________", userId)
 
     UserInfo.findById(userId)
         .then(userInfo => {
@@ -383,8 +540,22 @@ router.get('/:userId/volunteer_detail', function (req, res) {
             }
             console.log("data being sent to frontend:\n", JSON.stringify(data))
             res.end(JSON.stringify(data))
+        }, (err) => {
+            console.log("______err caught here first____")
+            res.writeHead(400, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 0,
+                "msg": "can't fetch the volunteer detail",
+                "info": {
+                    result: userInfo
+                }
+            }
+            res.end("JSON.stringify(data)")
         })
         .catch(err => {
+            console.log("___________err____________")
             res.writeHead(400, {
                 'Content-Type': 'application/json'
             })
@@ -403,8 +574,499 @@ router.get('/:userId/volunteer_detail', function (req, res) {
 /**
  * post an opportunity by the ngo
  */
+router.post('/:userId/post_opportunity', async function (req, res, next) {
+
+    console.log('in posting an opportunity request');
+    console.log("Request Got: ", req.body);
+    var userId = req.params.userId;
+    console.log("_________userId__________", userId);
+
+    var latitude = req.body.lat
+    var longitude = re.body.long
+    if (latitude == 0 || longitude == 0) {
+
+        getCoords('San Jose')
+            .then((coords) => {
+                console.log(coords);
+                latitude = coords.lat,
+                longitude = coords.lng
 
 
+                var opportunity = new Opportunity({
+                    opp_name: req.body.opp_name,
+                    opp_description: req.body.opp_description,
+                    posted_by: req.params.posted_by,
+                    organisation_name: req.body.organisation_name,
+                    cause: req.body.cause,
+                    start_date: req.body.start_date,
+                    end_date: req.body.end_date,
+                    hrs: req.body.hrs,
+                    location: req.body.location,
+                    lat: latitude,
+                    long: longitude
+            
+                })
+                opportunity.save()
+                    .then(result => {
+                        console.log("_________result_________", result)
+                        UserInfo.findByIdAndUpdate(userId, {
+                            $push: {
+                                opportunities_posted: result._id
+                            }
+                        }).exec()
+                            .then(userResult => {
+                                res.writeHead(200, {
+                                    'Content-Type': 'application/json'
+                                })
+                                const data = {
+                                    "status": 1,
+                                    "msg": "Successfully posted an opportunity",
+                                    "info": {
+                                        result: result
+                                    }
+                                }
+                                console.log("data being sent to frontend:\n", JSON.stringify(data))
+                                res.end(JSON.stringify(data))
+                            })
+                            .catch(err => {
+                                console.log("_____________err_____________", err)
+                                res.writeHead(400, {
+                                    'Content-Type': 'application/json'
+                                })
+                                const data = {
+                                    "status": 0,
+                                    "msg": "can't fetch the volunteer detail",
+                                    "info": {
+                                        result: userResult
+                                    }
+                                }
+                                res.end(JSON.stringify(data))
+                            })
+            
+                    }, (err) => {
+                        res.writeHead(400, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 0,
+                            "msg": "can't poste the opportunity",
+                            "info": {
+                                result: userInfo
+                            }
+                        }
+                        res.end(JSON.stringify(data))
+                    })
+            });
+
+    }else{
+        var opportunity = new Opportunity({
+            opp_name: req.body.opp_name,
+            opp_description: req.body.opp_description,
+            posted_by: req.params.posted_by,
+            organisation_name: req.body.organisation_name,
+            cause: req.body.cause,
+            start_date: req.body.start_date,
+            end_date: req.body.end_date,
+            hrs: req.body.hrs,
+            location: req.body.location,
+            lat: latitude,
+            long: longitude
+    
+        })
+        opportunity.save()
+            .then(result => {
+                console.log("_________result_________", result)
+                UserInfo.findByIdAndUpdate(userId, {
+                    $push: {
+                        opportunities_posted: result._id
+                    }
+                }).exec()
+                    .then(userResult => {
+                        res.writeHead(200, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 1,
+                            "msg": "Successfully posted an opportunity",
+                            "info": {
+                                result: result
+                            }
+                        }
+                        console.log("data being sent to frontend:\n", JSON.stringify(data))
+                        res.end(JSON.stringify(data))
+                    })
+                    .catch(err => {
+                        console.log("_____________err_____________", err)
+                        res.writeHead(400, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 0,
+                            "msg": "can't fetch the volunteer detail",
+                            "info": {
+                                result: userResult
+                            }
+                        }
+                        res.end(JSON.stringify(data))
+                    })
+    
+            }, (err) => {
+                res.writeHead(400, {
+                    'Content-Type': 'application/json'
+                })
+                const data = {
+                    "status": 0,
+                    "msg": "can't poste the opportunity",
+                    "info": {
+                        result: userInfo
+                    }
+                }
+                res.end(JSON.stringify(data))
+            })
+    }
+    
+
+});
+
+/**
+ * search the opportunity by location
+ */
+router.put("/search/opportunity/location", async function (req, res, next) {
+
+    console.log("\nInside the search request for opportunity");
+    console.log("\nRequest obtained is : ");
+    console.log(JSON.stringify(req.body.location));
+    var place1 = {};
+    var lat, long;
+
+    weather.find({ search: req.body.location, degreeType: 'F' }, function (err, result) {
+        if (err) console.log(err);
+
+        console.log("~~~~~~~~~~~~~~~~~~~~~~", JSON.stringify(result[0].location.lat, null, 2));
+        console.log(JSON.stringify(result[0].location.long, null, 2));
+        // console.log("~~~~~~~~~result~~~~~~~~~~``",result)
+        // lat = result[0].location
+        long = result[0].location.long
+        lat = JSON.stringify(result[0].location.lat, null, 2)
+
+        place1 = {
+            lat: result[0].location.lat,
+            long: result[0].location.long
+        }
+        var Berlin = {
+            lat: 52.523,
+            lon: 13.412
+        };
+        place1;
+        // console.log("~~~~~~~~~~~~~place1~~~~~~~~~~~~~`", place1, long)
+        var dist = Distance.between(place1, Berlin)
+        console.log('' + dist.human_readable());
+        if (dist > Distance('800 km')) {
+            console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nice journey!');
+        }
+
+
+    });
+
+    console.log("~~~~~~~~~~~~~place1~~~~~~~~~~~~~`", place1, long)
+
+
+    // var Oslo = {
+    //     lat: 59.914,
+    //     lon: 10.752
+    // };
+
+    // var OsloToBerlin = Distance.between(Oslo, Berlin);
+
+    // console.log('' + OsloToBerlin.human_readable());
+    // if (OsloToBerlin > Distance('800 km')) {
+    //     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nice journey!');
+    // }
+
+
+
+
+    Opportunity.find({
+        location: { $regex: req.body.location, $options: 'i' }
+    }).exec()
+        .then((result, err) => {
+            console.log("_______result_________", result)
+            console.log("_______result length_________", result.length)
+
+            if (!result.length == 0) {
+                res.writeHead(200, {
+                    'Content-Type': 'application/json'
+                })
+                const data = {
+                    "status": 1,
+                    "msg": "Successfully fetched search results",
+                    "info": {
+                        result: result
+                    }
+                }
+                console.log("data being sent to frontend:\n", JSON.stringify(data))
+                res.end(JSON.stringify(data))
+            } else {
+                res.writeHead(200, {
+                    'Content-Type': 'application/json'
+                })
+                const data = {
+                    "status": 0,
+                    "msg": "No data in search query",
+                    "info": {
+                        result: result
+                    }
+                }
+                console.log("data being sent to frontend:\n", JSON.stringify(data))
+                res.end(JSON.stringify(data))
+            }
+        })
+        .catch(err => {
+            console.log("___________err____________", err)
+            res.writeHead(400, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 0,
+                "msg": "can't fetch the search results",
+                "info": {
+                    result: result
+                }
+            }
+            res.end("JSON.stringify(data)")
+        })
+
+
+
+});
+
+/**
+ * apply for the opportunity
+ */
+router.put("/:userId/apply/opportunity", async function (req, res, next) {
+
+    console.log("\nInside the apply request of opportunity");
+    console.log("\nRequest obtained is : ");
+    console.log(JSON.stringify(req.body.opportunityId));
+
+    const userId = req.params.userId
+    const opportunityId = req.body.opportunityId
+
+    UserInfo.findByIdAndUpdate(userId,
+        {
+            $push: {
+                opportunities_enrolled: opportunityId,
+            }
+        }).exec()
+        .then(user_result => {
+            console.log("____________user_result_________", user_result)
+            Opportunity.findByIdAndUpdate(opportunityId, {
+                $push: {
+                    applicants: userId,
+
+                }
+
+            }).exec()
+                .then(result => {
+                    // callback(null, "Success")
+                    res.writeHead(200, {
+                        'Content-Type': 'application/json'
+                    })
+                    const data = {
+                        "status": 1,
+                        "msg": "Successfully applied for the opportunity",
+                        "info": {}
+                    }
+                    console.log("data being sent to frontend:\n", JSON.stringify(data))
+                    res.end(JSON.stringify(data))
+                })
+                .catch(err => {
+                    console.log("___________err____________", err)
+                    res.writeHead(400, {
+                        'Content-Type': 'application/json'
+                    })
+                    const data = {
+                        "status": 0,
+                        "msg": "can't apply for the job",
+                        "info": {
+                            result: result
+                        }
+                    }
+                    res.end("JSON.stringify(data)")
+                })
+        })
+        .catch(err => {
+
+            console.log("___________err____________", err)
+            res.writeHead(400, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 0,
+                "msg": "can't apply for the job",
+                "info": {
+                    result: result
+                }
+            }
+            res.end("JSON.stringify(data)")
+        })
+
+
+
+});
+
+/**
+ * get opportunity details
+ */
+router.get('/:opportunityId/opportunity_detail', function (req, res) {
+    console.log("inside the get request for opportunity details")
+
+    const opportunityId = req.params.opportunityId
+    console.log("_________userId___________", opportunityId)
+
+    Opportunity.findById(opportunityId)
+        .then(userInfo => {
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 1,
+                "msg": "Successfully fetched the opportunity details",
+                "info": {
+                    result: userInfo
+                }
+            }
+            console.log("data being sent to frontend:\n", JSON.stringify(data))
+            res.end(JSON.stringify(data))
+        }, (err) => {
+            console.log("______err caught here first____")
+            res.writeHead(400, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 0,
+                "msg": "can't fetch the opportunity detail",
+                "info": {
+                    result: userInfo
+                }
+            }
+            res.end("JSON.stringify(data)")
+        })
+        .catch(err => {
+            console.log("___________err____________")
+            res.writeHead(400, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 0,
+                "msg": "can't fetch the opportunity detail",
+                "info": {
+                    result: userInfo
+                }
+            }
+            res.end("JSON.stringify(data)")
+        })
+
+})
+
+/**
+ * search the opportunity by location
+ */
+router.put("/search/opportunity/location/lat_long", async function (req, res, next) {
+
+    console.log("\nInside the search request for opportunity !!!!!!!!!!!!!!!");
+    console.log("\nRequest obtained is : ");
+    console.log(JSON.stringify(req.body));
+    var place2 = {};
+    const lat = req.body.lat;
+    const long = req.body.long;
+    place2 = {
+        lat: lat,
+        long: long
+    }
+    Opportunity.find().exec()
+        .then((result_o, err) => {
+            console.log("_______result_________", result_o)
+            console.log("_______result length_________", result_o.length)
+            //iterate throught the length of the result
+            //get the city name
+            //get the lat long of it
+            //if it matches the criteria store it in an array
+            //place1 is from data base, place2 if of user 
+            if (!result_o.length == 0) {
+                var i = 0;
+                var loc;
+                let place1 = {};
+                var resultArr = [];
+                var distance_arr = [];
+                var places_arr = [];
+                var latt, longg, dist;
+                var k;
+                var flag;
+
+
+                for (i = 0; i < result_o.length; i++) {
+                    loc = result_o[i].location;
+                    place1 = {
+                        lat: result_o[i].lat,
+                        long: result_o[i].location.long
+                    }
+                    var dist = Distance.between(place1, place2)
+                    console.log('' + dist.human_readable());
+                    if (dist > Distance('10km')) {
+                        console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nice journey!');
+                        resultArr.push(result_o);
+                    }
+
+                }
+
+
+                res.writeHead(200, {
+                    'Content-Type': 'application/json'
+                })
+                const data = {
+                    "status": 1,
+                    "msg": "Successfully fetched search results",
+                    "info": {
+                        result: result_o
+                    }
+                }
+                console.log("data being sent to frontend:\n", JSON.stringify(data))
+                res.end(JSON.stringify(data))
+            } else {
+
+                res.writeHead(200, {
+                    'Content-Type': 'application/json'
+                })
+                const data = {
+                    "status": 0,
+                    "msg": "No data in search query",
+                    "info": {
+                        result: result_o
+                    }
+                }
+                console.log("data being sent to frontend:\n", JSON.stringify(data))
+                res.end(JSON.stringify(data))
+            }
+        })
+        .catch(err => {
+            console.log("___________err____________", err)
+            res.writeHead(400, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 0,
+                "msg": "can't fetch the search results",
+                "info": {
+                    result: result_o
+                }
+            }
+            res.end("JSON.stringify(data)")
+        })
+
+
+
+});
 
 
 
