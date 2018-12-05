@@ -76,7 +76,9 @@ var users= mongoose.model('Users',{
     qb_id : {
         type : String
     },
-        
+    industry:{
+        type:Array
+    },  
     opportunities_enrolled : [
         {
             type: mongoose.Schema.Types.ObjectId,
