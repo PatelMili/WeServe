@@ -41,7 +41,7 @@ router.post('/volunteer/signup', async function (req, res, next) {
         password: pwd,
         username: username,
         city: city,
-        cause: cause,
+        causes: cause,
         age: age,
         gender: gender
     })
