@@ -18,6 +18,9 @@
   color: white;
 }
 
+.error{
+  color: red;
+}
 .App-link {
   color: #61dafb;
 }

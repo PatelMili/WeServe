@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Link } from 'react-router-dom';
+
 //import '../travelerLogin/travelerLogin.css';
 /*import axios from 'axios';
 import cookie from 'react-cookies';
@@ -11,7 +11,6 @@ import Navbar from '../components/navbar';
 import homePageBackground from '../assets/images/homePageBackground.jpg';
 import homePageBackground2 from '../assets/images/homePageBackground2.jpg';
 import homePageBackground3 from '../assets/images/homePageBackground3.jpg';
-import { ROOT_URL } from '../constants/constants';
 
 var Carousel = require('react-responsive-carousel').Carousel;
 
@@ -28,11 +27,12 @@ class homePage extends Component {
                 hrs: 5,
                 location: "Mumbai"
             });
-        }
+        } 
+
         const volunteer = [];
         for (let i = 0; i < 6; i++) {
             volunteer.push({
-                fname: "Devanshi",
+                fname: "devanshi",
                 lname: "trivedi",
                 opportunities_enrolled: [{ opp_name: "opp1", opp_description: "desc1" }, { opp_name: "opp2", opp_description: "desc2" }],
                 causes: ["care", "enviornment"],
@@ -41,15 +41,22 @@ class homePage extends Component {
         }
 
         this.state = {
-            opportunityResults: people,
-            volunteerResults: volunteer
+            
+            volunteerResults: volunteer,
+            handleOpportunity:""
             /* clickedUser:"Lauren Miller",
              clickedUserDetails:"Amazon Recruiter"*/
         }
         /*this.handleCreateNewMesage = this.handleCreateNewMesage.bind(this);
         this.handleClickedViewMsg = this.handleClickedViewMsg.bind(this);*/
+        this.handleOpportunity = this.handleOpportunity.bind(this);
     }
 
+    handleOpportunity = () => {
+        /*this.setState({
+            createMsgFlag : false
+        });*/
+    }
     /*  handleCreateNewMesage = () => {
           this.setState({
               createMsgFlag : true
@@ -62,44 +69,8 @@ class homePage extends Component {
       }*/
 
     render() {
-        require('../styles/homePage.css');
+        require('../styles/volunteerDashboard.css');
         let redirect = null;
-
-        let DisplayMsgList = null;
-        //location based
-        DisplayMsgList = (
-
-            <div class="flex-container ">
-
-                {this.state.opportunityResults.map((opportunity, index) => (
-                    <div key={index} >
-
-                        <div class="card-title firstheight" style={{ 'textAlign': 'center' }}>
-                            <h4>{opportunity.opp_name}</h4>
-                        </div>
-                        <div class="card-body secondheight">
-                            <div className="row ">
-                                <div class="col-sm-2 col-md-2 col-lg-2  ">
-                                    <i class="icon ion-calendar ionIcon"></i> <br></br>
-                                    <i class="icon ion-clock ionIcon"></i> <br></br>
-                                    <i class="icon ion-navigate ionIcon"></i>
-                                </div>
-                                <div class="col-sm-8 col-md-8 col-lg-8  ">
-                                    <div className="bottomPadding">{opportunity.start_date}-{opportunity.end_date} </div>
-                                    <div className="bottomPadding">{opportunity.hrs}hrs/week</div>
-                                    <div >{opportunity.location} </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body thirdheight">
-                        <Link to='/login'><button className="mysendButton"> Join Us Today!</button></Link>
-                            <button className="mysendButton"> Read More</button>
-                        </div>
-
-                    </div>
-                ))}
-            </div>
-        )
 
         let userList = null;
         //student based
@@ -130,7 +101,7 @@ class homePage extends Component {
 
                         </div>
                         <div class="card-body thirdheight">
-                            <button className="mysendButton"> Apply!</button>
+                            <button className="mysendButton"> Contact</button>
                             <button className="mysendButton" data-toggle="modal" data-target="#myModal"> Read More</button>
                             <div id="myModal" class="modal fade" role="dialog">
                                 <div class="modal-dialog">
@@ -175,35 +146,28 @@ class homePage extends Component {
 
                 <Navbar />
 
-                <div class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner imageHeight">
-                        <div class="carousel-item active">
-                            <img src={homePageBackground} />
-                        </div>
-                        <div class="carousel-item ">
-                            <img src={homePageBackground2} />
-                        </div>
-                        <div class="carousel-item">
-                            <img src={homePageBackground3} />
-                        </div>
-
-                        <div class="carousel-caption">
-                            <h3 style={{ "color": "white" }}>Raise Your Helping Hand</h3>
-                            <button className="joinUsButton"><h4>JOIN US TODAY!</h4></button>
-                        </div>
-                    </div>
-                </div>
 
                 <div className="greyBackground">
                     <br></br>
-                    <h2 className="textCenter">FEATURED OPPORTUNITIES</h2>
-                    <br></br>
-                    {DisplayMsgList}
+                    <label for="sel1"><h6>Tell us what you care for:</h6></label>
+                    <select onChange={this.handleOpportunity} class="form-control myWidth" id="sel1">
+                        <option value="" >Select cause...</option>
+                        <option value="Children and Youth" selected={this.state.handelOpportunity == "Children and Youth"}>Children and Youth</option>
+                        <option value="Education and Literacy" selected={this.state.handelOpportunity == "Education"}>Education</option>
+                        <option value="Animals" selected={this.state.handelOpportunity == "Animals"}>Animals</option>
+                        <option value="Community Development" selected={this.state.handelOpportunity == "Community Development"}>Community Development</option>
+                        <option value="Enviornment" selected={this.state.handelOpportunity == "Enviornment"}>Enviornment</option>
+                        <option value="Senior" selected={this.state.handelOpportunity == "Senior"}>Senior </option>
+                        <option value="Health and Medicine" selected={this.state.handelOpportunity == "Health and Medicine"}>Health and Medicine</option>
+                        <option value="Advocacy and HR" selected={this.state.handelOpportunity == "Advocacy and HR"}>Advocacy and HR</option>
+                        <option value="Specially Abled People" selected={this.state.handelOpportunity == "Specially Abled People"}>Specially Abled People</option>
+                       
+                    </select>
+
+                    <button type="submit" className="mybutton">GO</button>
                     <br></br><br></br>
-                    <div>
-                        <h4>What volunteers have to say!</h4>
-                    </div>
                     {userList}
+                    <br></br><br></br>
                 </div>
             </div>
         )

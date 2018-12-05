@@ -1,35 +1,3 @@
-.textCenter{
-    
-    font-family: serif;
-    align-content: center;
-}
-.greyBackground{
-    
-    background-color: #76ab445c;
-    height: auto; 
-    padding: 3%;
-    text-align: center; 
-}
-.infoPadding{
-    text-align: center;
-}
-.joinUsButton{
-    color: black;
-    background-color: #7fc241;
-    border: none;
-    width: 10%;
-    height: 6vh;
-    margin: 0.5%;
-    
-}
-.myVision{
-    background-color: white;
-    width:70vh;
-    height: 20vh;
-}
-.alignCenter{
-    align-content: center;
-}
 .mysendButton{
     border: none;
     margin: 1%;
@@ -90,17 +58,34 @@
 }
 
 .myWidth{
-    
-    margin-left: 35%;
-    width: 30%;
+    margin-left: 40%;
+    width: 20%;
 }
- 
+.mybutton{ 
+
+    border: none;
+    margin: 1%; 
+    padding: 0.5%;
+    padding-left: 1%;
+    padding-right: 1%;
+    width: 10%;
+    background-color: #7fc241;
+    color: white;
+}
 .imageHeight{
     position: relative;
     text-align: center;
 }
 
- 
+.joinUsButton{
+    color: black;
+    background-color: #7fc241cc;
+    border: none;
+    width: 25%;
+    height: 6vh;
+    text-align: center; 
+}
+
 .greyBackground{
     text-align: center;
     align-content: center;

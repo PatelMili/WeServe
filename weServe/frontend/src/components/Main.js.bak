@@ -10,10 +10,6 @@ import loginNGO from './loginNGO';
 import signUp from './signUp';
 import beaVolunteer from './beaVolunteer'
 import findaVolunteer from './findaVolunteer'
-import volunteerDashboard from './volunteerDashboard'
-import ngoDashboard from './ngoDashboard'
-import signUpVolunteer from './signUpVolunteer'
-
 
 class Main extends Component {
     render() {
@@ -30,10 +26,7 @@ class Main extends Component {
                 <Route exact path="/signUp" component={signUp} />
                 <Route exact path="/beaVolunteer" component={beaVolunteer} />
                 <Route exact path="/findaVolunteer" component={findaVolunteer} />
-                <Route exact path="/volunteerDashboard" component={volunteerDashboard} />
-                <Route exact path="/ngoDashboard" component={ngoDashboard} />
-                <Route exact path="/signUpVolunteer" component={signUpVolunteer} />
-
+                
             </div>
         )
     }

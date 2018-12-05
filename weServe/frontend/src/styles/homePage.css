@@ -1,7 +1,23 @@
+.mysendButton{
+    border: none;
+    margin: 1%;
+    padding: 1%;
+    padding-left: 1%;
+    padding-right: 1%;
+    width: 30%;
+    background-color: #7fc241;
+    color: white;
+}
+.bottomPadding{
+    padding-bottom: 12px;
+}
+.leftpad{ 
+    padding-left: 20%;
+}
 
 .carousel-inner img {
     width: 100%; 
-    height: 75vh;
+    height: 85vh;
 }
 .carousel-inner > .item {
     position: relative;
@@ -23,6 +39,10 @@
     line-height: 0px;
 }
 
+.ionIcon{
+    font-size: 35px;
+    padding-left: 20px;
+}
 .firstheight{
     padding: 2%; 
 }
@@ -31,13 +51,18 @@
 }
 .thirdheight{
     padding: 2%; 
+    text-align: center;
+}
+.fonts{
+    font-size: 15px;
 }
 
-
-
-
-
-
+.myWidth{
+    
+    margin-left: 35%;
+    width: 30%;
+}
+ 
 .imageHeight{
     position: relative;
     text-align: center;
@@ -45,7 +70,7 @@
 
 .joinUsButton{
     color: black;
-    background-color: aqua;
+    background-color: #7fc241cc;
     border: none;
     width: 25%;
     height: 6vh;
@@ -53,9 +78,21 @@
 }
 
 .greyBackground{
-    background-color: #edffec;
+    text-align: center;
+    align-content: center;
+    background-color: #76ab445c;
 }
 
+.searchText{
+    width: 25%;
+    font-size: 20px;
+}
+.searchButton{
+    width: 5%;
+    height: 35px;
+    margin: 1%;
+    border: none;
+}
 .textCenter{
     text-align: center; 
     font-family: serif;
@@ -68,7 +105,8 @@
     justify-content: center; 
   }
   .flex-container > div {
-    background-color: #f1f1f1;
+    background-color: white;
+    border: 1px solid lightgrey;
     width: 30%; 
     margin: 10px;
     text-align: center;

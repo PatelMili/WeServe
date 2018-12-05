@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
 
- 
+
 //import '../travelerLogin/travelerLogin.css';
 /*import axios from 'axios';
 import cookie from 'react-cookies';
 import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router';*/
 
-import Navbar from '../components/navbar'; 
+import Navbar from '../components/navbar';
 
 var Carousel = require('react-responsive-carousel').Carousel;
 
-class aboutUs extends Component {
+class readMore extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { 
-            aboutUsInfo:"aekfjhj"
+        this.state = {
+            ngoName: "Healing Dove Foundation",
+            ngoVision: "Vision",
+            ngoMission: "Mission"
             /* clickedUser:"Lauren Miller",
              clickedUserDetails:"Amazon Recruiter"*/
         }
@@ -36,24 +38,33 @@ class aboutUs extends Component {
       }*/
 
     render() {
-        require('../styles/aboutUs.css');
+        require('../styles/readMore.css');
         let redirect = null;
+
+
 
         return (
             <div>
                 {redirect}
+
                 <Navbar />
- 
+
                 <div className="greyBackground">
-                    <br></br>     
-                    <h2 className="textCenter" style={{"color":"green"}}>About Us</h2>
                     <br></br>
-                    <p className="infoPadding">{this.state.aboutUsInfo}</p><br></br>
+                    <h2 className="textCenter" style={{ "color": "green" }}>{this.state.ngoName}</h2>
+                    <br></br> 
+                        <h5>Our Vision</h5> 
+                            <p className="infoPadding">{this.state.ngoVision}</p><br></br>
+                       
+                        <h5>Our Mission</h5> 
+                            <p className="infoPadding">{this.state.ngoMission}</p><br></br>
+                      
                      
+                    <button className="joinUsButton">Join Us</button>
                 </div>
             </div>
         )
     }
 }
 
-export default aboutUs;
+export default readMore;
