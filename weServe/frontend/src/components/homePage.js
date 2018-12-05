@@ -113,6 +113,8 @@ class homePage extends Component {
                     <br></br>     
                     <h2 className="textCenter">FEATURED OPPORTUNITIES</h2>
                     <br></br>
+
+                    
                     {DisplayMsgList}
                 </div>
             </div>

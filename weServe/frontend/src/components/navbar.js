@@ -18,10 +18,10 @@ class navbar extends Component {
     }
     render() {
         var fname=localStorage.getItem("ownerEmailNavbar");
+        let redirectVar=null;
         require('../styles/navbar.css'); 
         return (
             
-
             <div>
                 <nav class="navbar navbar-default">
                     <div class="container-fluid">
