@@ -210,34 +210,18 @@ router.post('/signup_google', async function (req, res, next) {
                 console.log("Successfully updated the profile")
                 console.log("_____result_____", result)
 
-                UserInfo.findById(userId)
-                    .then(userInfo => {
-                        res.writeHead(200, {
-                            'Content-Type': 'application/json'
-                        })
-                        const data = {
-                            "status": 1,
-                            "msg": "Successfully updated the profile",
-                            "info": {
-                                result: userInfo
-                            }
-                        }
-                        console.log("data being sent to frontend:\n", JSON.stringify(data))
-                        res.end(JSON.stringify(data))
-                    })
-                    .catch(err => {
-                        res.writeHead(400, {
-                            'Content-Type': 'application/json'
-                        })
-                        const data = {
-                            "status": 0,
-                            "msg": "can't update the profile",
-                            "info": {
-                                result: userInfo
-                            }
-                        }
-                        res.end("JSON.stringify(data)")
-                    })
+                res.writeHead(200, {
+                    'Content-Type': 'application/json'
+                })
+                const data = {
+                    "status": 1,
+                    "msg": "Successfully updated the profile",
+                    "info": {
+                        result: result
+                    }
+                }
+                console.log("data being sent to frontend:\n", JSON.stringify(data))
+                res.end(JSON.stringify(data))
 
             }
         })
@@ -1130,12 +1114,6 @@ router.get('/:opportunityId/opportunity_detail', function (req, res) {
 /**
  * search the opportunity by location
  * 
- * 
- * 
- * 
- * 
- * 
- * 
  */
 router.put("/search/opportunity/location/lat_long", async function (req, res, next) {
 
@@ -1143,97 +1121,286 @@ router.put("/search/opportunity/location/lat_long", async function (req, res, ne
     console.log("\nRequest obtained is : ");
     console.log(JSON.stringify(req.body));
     var place2 = {};
-    const lat = req.body.lat;
-    const long = req.body.long;
-   
-    
-    if (lat == 0 || long== 0) {
+    var lat = req.body.lat;
+    var long = req.body.long;
+
+    var result_first;
+    if (lat == 0 || long == 0) {
         getCoords('San Jose')
             .then((coords) => {
                 console.log(coords);
                 lat = coords.lat,
                     long = coords.lng
-                    place2={
-                        lat:lat,
-                        long:long
-                       
-                    }
+                place2 = {
+                    lat: lat,
+                    long: long
+                }
+
+
+                Opportunity.find().exec()
+                    .then((result_o, err) => {
+                        // console.log("_______result_________", result_o)
+                        // console.log("_______result length_________", result_o.length)
+                        //iterate throught the length of the result
+                        //get the city name
+                        //get the lat long of it
+                        //if it matches the criteria store it in an array
+                        //place1 is from data base, place2 if of user 
+                        if (!result_o.length == 0) {
+                            var i = 0;
+                            let place1 = {};
+                            var resultArr = [];
+                            for (i = 0; i < result_o.length; i++) {
+                                loc = result_o[i].location;
+                                place1 = {
+                                    lat: result_o[i].lat,
+                                    long: result_o[i].location.long
+                                }
+                                var dist = Distance.between(place1, place2)
+                                console.log('' + dist.human_readable());
+                                if (dist > Distance('10km')) {
+                                    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nice journey!');
+                                    resultArr.push(result_o);
+                                }
+
+                            }
+
+                            first_result = result_o;
+
+
+                            UserInfo.aggregate([
+
+                                { $match: { type: "V" } },
+                                {
+                                    $project: {
+                                        username: 1,
+                                        city: 1,
+                                        causes: 1,
+                                        count: { $size: '$opportunities_enrolled' }
+                                    }
+                                },
+                                { $sort: { count: -1 } },
+                                { $limit: 6 }
+                            ])
+                                .then(result => {
+
+                                    var i;
+                                    var id = [];
+                                    for (i = 0; i < result.length; i++) {
+                                        id.push(result[i]._id);
+                                    }
+
+                                    UserInfo.find({ "_id": { "$in": id } })
+                                        .populate('opportunities_enrolled')
+                                        .exec()
+                                        .then(result => {
+                                            console.log("~~~~~~~~~~result~~~~~~~~~~````", JSON.stringify(result))
+                                            res.writeHead(200, {
+                                                'Content-Type': 'application/json'
+                                            })
+                                            const data = {
+                                                "status": 1,
+                                                "msg": "successfully found top 6 volunteers",
+                                                "info": {
+                                                    "result_volunteer": result,
+                                                    "result_ngo": first_result
+                                                }
+                                            }
+                                            res.end(JSON.stringify(data))
+                                        })
+
+                                    // console.log("_______id_______", id)
+                                    // console.log("_____________result__________", result)
+
+                                })
+                                .catch(err => {
+                                    console.log("___________________errr_____________-", err)
+                                    const data = {
+                                        "status": 0,
+                                        "msg": "Failed fetching the details of top 6 opportunities",
+                                        "info": err
+                                    }
+                                    res.writeHead(200, {
+                                        'Content-Type': 'application/json'
+                                    })
+                                    res.end(JSON.stringify(data))
+                                })
+                                .catch(err => {
+                                    res.send(400, err)
+                                })
+                        } else {
+
+                            res.writeHead(200, {
+                                'Content-Type': 'application/json'
+                            })
+                            const data = {
+                                "status": 0,
+                                "msg": "No data in search query",
+                                "info": {
+                                    "result_volunteer": result,
+                                    "result_ngo": first_result
+                                }
+                            }
+                            console.log("data being sent to frontend:\n", JSON.stringify(data))
+                            res.end(JSON.stringify(data))
+                        }
+                    })
+                    .catch(err => {
+                        console.log("___________err____________", err)
+                        res.writeHead(400, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 0,
+                            "msg": "can't fetch the search results",
+                            "info": {
+                                // "result_volunteer": result,
+                                "result_ngo": first_result
+                            }
+                        }
+                        res.end("JSON.stringify(data)")
+                    })
             })
     }
     else {
+        Opportunity.find().exec()
+            .then((result_o, err) => {
+                // console.log("_______result_________", result_o)
+                // console.log("_______result length_________", result_o.length)
+                //iterate throught the length of the result
+                //get the city name
+                //get the lat long of it
+                //if it matches the criteria store it in an array
+                //place1 is from data base, place2 if of user 
+                if (!result_o.length == 0) {
+                    var i = 0;
+                    let place1 = {};
+                    var resultArr = [];
+                    for (i = 0; i < result_o.length; i++) {
+                        loc = result_o[i].location;
+                        place1 = {
+                            lat: result_o[i].lat,
+                            long: result_o[i].location.long
+                        }
+                        var dist = Distance.between(place1, place2)
+                        console.log('' + dist.human_readable());
+                        if (dist > Distance('10km')) {
+                            console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nice journey!');
+                            resultArr.push(result_o);
+                        }
 
-    }
-    Opportunity.find().exec()
-        .then((result_o, err) => {
-            console.log("_______result_________", result_o)
-            console.log("_______result length_________", result_o.length)
-            //iterate throught the length of the result
-            //get the city name
-            //get the lat long of it
-            //if it matches the criteria store it in an array
-            //place1 is from data base, place2 if of user 
-            if (!result_o.length == 0) {
-                var i = 0;
-                let place1 = {};
-                var resultArr = [];
-                for (i = 0; i < result_o.length; i++) {
-                    loc = result_o[i].location;
-                    place1 = {
-                        lat: result_o[i].lat,
-                        long: result_o[i].location.long
-                    }
-                    var dist = Distance.between(place1, place2)
-                    console.log('' + dist.human_readable());
-                    if (dist > Distance('10km')) {
-                        console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nice journey!');
-                        resultArr.push(result_o);
                     }
 
+
+                    result_first = result_o
+
+
+                    UserInfo.aggregate([
+
+                        { $match: { type: "V" } },
+                        {
+                            $project: {
+                                username: 1,
+                                city: 1,
+                                causes: 1,
+                                count: { $size: '$opportunities_enrolled' }
+                            }
+                        },
+                        { $sort: { count: -1 } },
+                        { $limit: 6 }
+                    ])
+                        .then(result => {
+
+                            var i;
+                            var id = [];
+                            for (i = 0; i < result.length; i++) {
+                                id.push(result[i]._id);
+                            }
+
+                            UserInfo.find({ "_id": { "$in": id } })
+                                .populate('opportunities_enrolled')
+                                .exec()
+                                .then(result => {
+                                    // console.log("~~~~~~~~~~result~~~~~~~~~~````", JSON.stringify(result))
+                                    res.writeHead(200, {
+                                        'Content-Type': 'application/json'
+                                    })
+                                    const data = {
+                                        "status": 1,
+                                        "msg": "successfully found top 6 volunteers",
+                                        "info": {
+                                            "result_volunteer": result,
+                                            "result_ngo": result_o
+                                        }
+                                    }
+                                    res.end(JSON.stringify(data))
+                                }).catch(e => {
+                                    console.log("___________________errr_____________-", e)
+                                    const data = {
+                                        "status": 0,
+                                        "msg": "Failed fetching the details of top 6 opportunities",
+                                        "info": e
+                                    }
+                                    res.writeHead(200, {
+                                        'Content-Type': 'application/json'
+                                    })
+                                    res.end(JSON.stringify(data))
+                                })
+
+
+                            // console.log("_______id_______", id)
+                            // console.log("_____________result__________", result)
+
+                        })
+                        .catch(err => {
+                            console.log("___________________errr_____________-", err)
+                            const data = {
+                                "status": 0,
+                                "msg": "Failed fetching the details of top 6 opportunities",
+                                "info": err
+                            }
+                            res.writeHead(200, {
+                                'Content-Type': 'application/json'
+                            })
+                            res.end(JSON.stringify(data))
+                        })
+                        .catch(err => {
+                            res.send(400, err)
+                        })
+
+                } else {
+
+                    res.writeHead(200, {
+                        'Content-Type': 'application/json'
+                    })
+                    const data = {
+                        "status": 0,
+                        "msg": "No data in search query",
+                        "info": {
+                            result: result_o
+                        }
+                    }
+                    console.log("data being sent to frontend:\n", JSON.stringify(data))
+                    res.end(JSON.stringify(data))
                 }
-
-
-                res.writeHead(200, {
-                    'Content-Type': 'application/json'
-                })
-                const data = {
-                    "status": 1,
-                    "msg": "Successfully fetched search results",
-                    "info": {
-                        result: result_o
-                    }
-                }
-                console.log("data being sent to frontend:\n", JSON.stringify(data))
-                res.end(JSON.stringify(data))
-            } else {
-
-                res.writeHead(200, {
+            })
+            .catch(err => {
+                console.log("___________err____________", err)
+                res.writeHead(400, {
                     'Content-Type': 'application/json'
                 })
                 const data = {
                     "status": 0,
-                    "msg": "No data in search query",
+                    "msg": "can't fetch the search results",
                     "info": {
                         result: result_o
                     }
                 }
-                console.log("data being sent to frontend:\n", JSON.stringify(data))
-                res.end(JSON.stringify(data))
-            }
-        })
-        .catch(err => {
-            console.log("___________err____________", err)
-            res.writeHead(400, {
-                'Content-Type': 'application/json'
+                res.end("JSON.stringify(data)")
             })
-            const data = {
-                "status": 0,
-                "msg": "can't fetch the search results",
-                "info": {
-                    result: result_o
-                }
-            }
-            res.end("JSON.stringify(data)")
-        })
+
+    }
+
 
 
 
@@ -1332,7 +1499,7 @@ router.get("/:userId/opportunities_by_gender", async function (req, res, next) {
         .exec()
         .then(result => {
             var gender = result.gender
-            if (gender == "Male") {
+            if (gender == "Male" || gender == "m") {
 
                 Opportunity.find({
                     $or: [{ cause: { $regex: "Communication", $options: 'i' } }, { cause: { $regex: "Education and Literacy", $options: 'i' } }]
