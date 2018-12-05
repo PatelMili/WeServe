@@ -25,7 +25,7 @@ var users= mongoose.model('Users',{
         required: true,
         unique:true
     },
-    contact : {
+    mobile_no : {
         type : String
     },
     gender : {
@@ -53,13 +53,11 @@ var users= mongoose.model('Users',{
         type : Array
     },
     languages : {
-        type : String
+        type : Array
     }, 
     hear_about_us : {
         type : String
     },
-
-    ////////////////////////////////////////////////////////
     organisation_name : {
         type : String
     },
