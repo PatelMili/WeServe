@@ -88,6 +88,7 @@ router.post('/volunteer/signup', async function (req, res, next) {
     })
 
 });
+
 /**
  * NGO Signup
  */
@@ -98,6 +99,8 @@ router.post('/ngo/signup', async function (req, res, next) {
     const email = req.body.email
     const pwd = bcrypt.hashSync(req.body.pwd, 10)
     const type = req.body.type
+    const fname = req.body.fname
+    const lname = req.body.lname
     const username = req.body.username
     const city = req.body.city
     const cause = req.body.cause
@@ -118,6 +121,8 @@ router.post('/ngo/signup', async function (req, res, next) {
         email: email,
         password: pwd,
         username: username,
+        fname: fname,
+        lname: lname,
         city: city,
         cause: cause,
         organisation_name: organisation_name,
@@ -170,71 +175,75 @@ router.post('/ngo/signup', async function (req, res, next) {
 
 });
 
+/**update in signup */
+router.post('/signup_google', async function (req, res, next) {
 
-// /* User Google login */
-// router.post('/google/login', async function (req, res, next) {
+    console.log('\n\nIn user signup');
+    console.log("Request Got: ", req.body)
+    const username = req.body.username
+    const city = req.body.city
+    const cause = req.body.cause
+    const age = req.body.age
+    const gender = req.body.gender
 
-//     console.log('\n\nIn user signup');
-//     console.log("Request Got: ", req.body)
-//     const email = req.body.email
-//     const pwd = bcrypt.hashSync(req.body.pwd, 10)
-//     const firstName = req.body.fname
-//     const lastName = req.body.lname
-//     const type = req.body.type
-//     const username = req.body.username
+    UserInfo.update(
+        { "username": username },
+        {
+            $set: {
 
-//     //mongo query here
-//     var user = new UserInfo({
-//         fname: firstName,
-//         lname: lastName,
-//         type: type,
-//         email: email,
-//         password: pwd,
-//         username: username
-//     })
-//     console.log(`user ${user}`);
+                "gender": gender,
+                "causes": cause,
+                "city": city,
+                "cause": cause
 
-//     user.save().then(user => {
-//         console.log("user created in mongo");
-//         // console.log(`user in then is ${user}`);
+            },
+        }, function (err, result) {
+            if (err) {
+                console.log("error occured", err)
+                res.writeHead(400, {
+                    'Content-Type': 'application/json'
+                })
 
-//         res.writeHead(200, {
-//             'Content-Type': 'application/json'
-//         })
-//         const data = {
-//             "status": 1,
-//             "msg": "Successfully Signed Up",
-//             "info": {
-//                 "id": user._id,
-//                 "fullname": user.fname + " " + user.lname,
-//                 "username": user.username,
-//                 "type": type,
-//                 "email": email
-//             }
-//         }
-//         console.log("data being sent to frontend:\n", JSON.stringify(data))
-//         res.end(JSON.stringify(data))
+                res.end("some error in sql query")
+
+            } else if (result) {
+                console.log("Successfully updated the profile")
+                console.log("_____result_____", result)
+
+                UserInfo.findById(userId)
+                    .then(userInfo => {
+                        res.writeHead(200, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 1,
+                            "msg": "Successfully updated the profile",
+                            "info": {
+                                result: userInfo
+                            }
+                        }
+                        console.log("data being sent to frontend:\n", JSON.stringify(data))
+                        res.end(JSON.stringify(data))
+                    })
+                    .catch(err => {
+                        res.writeHead(400, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 0,
+                            "msg": "can't update the profile",
+                            "info": {
+                                result: userInfo
+                            }
+                        }
+                        res.end("JSON.stringify(data)")
+                    })
+
+            }
+        })
 
 
-//     }, (err) => {
-//         console.log("__________err_______8787878____", err)
-//         console.log(`Signup Failed in mongo`);
-//         console.log("User already exists ", err.errmsg)
-//         res.writeHead(200, {
-//             'Content-Type': 'application/json'
-//         })
-//         const data = {
-//             "status": 0,
-//             "msg": err.message,
-//             "info": {
-//                 "error": err.message
-//             }
-//         }
-//         console.log("data being sent to frontend:\n", JSON.stringify(data))
-//         res.end(JSON.stringify(data))
-//     })
-
-// });
+});
 
 /*login  */
 router.post('/login', async function (req, res, next) {
@@ -582,15 +591,14 @@ router.post('/:userId/post_opportunity', async function (req, res, next) {
     console.log("_________userId__________", userId);
 
     var latitude = req.body.lat
-    var longitude = re.body.long
+    var longitude = req.body.long
     if (latitude == 0 || longitude == 0) {
 
         getCoords('San Jose')
             .then((coords) => {
                 console.log(coords);
                 latitude = coords.lat,
-                longitude = coords.lng
-
+                    longitude = coords.lng
 
                 var opportunity = new Opportunity({
                     opp_name: req.body.opp_name,
@@ -603,8 +611,9 @@ router.post('/:userId/post_opportunity', async function (req, res, next) {
                     hrs: req.body.hrs,
                     location: req.body.location,
                     lat: latitude,
-                    long: longitude
-            
+                    long: longitude,
+                    rating: 0
+
                 })
                 opportunity.save()
                     .then(result => {
@@ -642,7 +651,7 @@ router.post('/:userId/post_opportunity', async function (req, res, next) {
                                 }
                                 res.end(JSON.stringify(data))
                             })
-            
+
                     }, (err) => {
                         res.writeHead(400, {
                             'Content-Type': 'application/json'
@@ -658,7 +667,7 @@ router.post('/:userId/post_opportunity', async function (req, res, next) {
                     })
             });
 
-    }else{
+    } else {
         var opportunity = new Opportunity({
             opp_name: req.body.opp_name,
             opp_description: req.body.opp_description,
@@ -671,7 +680,7 @@ router.post('/:userId/post_opportunity', async function (req, res, next) {
             location: req.body.location,
             lat: latitude,
             long: longitude
-    
+
         })
         opportunity.save()
             .then(result => {
@@ -709,7 +718,7 @@ router.post('/:userId/post_opportunity', async function (req, res, next) {
                         }
                         res.end(JSON.stringify(data))
                     })
-    
+
             }, (err) => {
                 res.writeHead(400, {
                     'Content-Type': 'application/json'
@@ -724,12 +733,12 @@ router.post('/:userId/post_opportunity', async function (req, res, next) {
                 res.end(JSON.stringify(data))
             })
     }
-    
+
 
 });
 
 /**
- * search the opportunity by location
+ * search the opportunity by location for volunteer
  */
 router.put("/search/opportunity/location", async function (req, res, next) {
 
@@ -839,6 +848,154 @@ router.put("/search/opportunity/location", async function (req, res, next) {
 
 
 });
+
+/**
+ * get top volunteers with max no of opportunities enrolled
+ */
+
+router.get('/top_rated/opportunities', function (req, res) {
+    console.log("inside the get top 6 opportunities")
+
+    Opportunity.aggregate([
+        { $match: { rating: { $gte: 2 } } },
+        { $sort: { rating: 1 } },
+        { $limit: 6 }
+    ])
+        .then(result => {
+            console.log("_____________result__________", result)
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 1,
+                "msg": "successfully found top 6 opportunities",
+                "info": {
+                    "result": result
+                }
+            }
+            res.end(JSON.stringify(data))
+        })
+        .catch(err => {
+            const data = {
+                "status": 0,
+                "msg": "Failed fetching the details of top 6 opportunities",
+                "info": err
+            }
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            res.end(JSON.stringify(data))
+        })
+        .catch(err => {
+            res.send(400, err)
+        })
+
+})
+
+/*get top 6 volunteers */
+router.get('/top_volunteers', function (req, res) {
+    console.log("inside the get top volunteers")
+
+    // Job.aggregate([
+    //     { $match: { postedBy: id1 } },
+    //     { $project: { jobTitle: 1, count: { $size: '$jobApplied' } } },
+    //     { $sort: { count: 1 } },
+    //     { $limit: 5 }
+
+    //   ])
+
+
+    // db.collection.aggregate([
+    //     // Project with an array length
+    //     { "$project": {
+    //         "title": 1,
+    //         "author": 1,
+    //         "votes": 1,
+    //         "length": { "$size": "$votes" }
+    //     }},
+
+    //     // Sort on the "length"
+    //     { "$sort": { "length": -1 } },
+
+    //     // Project if you really want
+    //     { "$project": {
+    //         "title": 1,
+    //         "author": 1,
+    //         "votes": 1,
+    //     }}
+    // ])
+
+
+
+    UserInfo.aggregate([
+
+        { $match: { type: "V" } },
+        {
+            $project: {
+                username: 1,
+                // opportunities_enrolled: 1,
+                // fname: 1,
+                // lname: 1,
+                // gender: 1,
+                // country: 1,
+                city: 1,
+                causes: 1,
+                count: { $size: '$opportunities_enrolled' }
+            }
+        },
+        { $sort: { count: -1 } },
+        { $limit: 6 }
+    ])
+        .then(result => {
+
+            var i;
+            var id = [];
+            for (i = 0; i < result.length; i++) {
+                id.push(result[i]._id);
+            }
+
+            // db.getCollection('feed').
+            // find({"_id" : {"$in" : [ObjectId("55880c251df42d0466919268"), ObjectId("55bf528e69b70ae79be35006")]}});
+            UserInfo.find({ "_id": { "$in": id } })
+                .populate('opportunities_enrolled')
+                .exec()
+                .then(result => {
+                    console.log("~~~~~~~~~~result~~~~~~~~~~````", JSON.stringify(result))
+                    res.writeHead(200, {
+                        'Content-Type': 'application/json'
+                    })
+                    const data = {
+                        "status": 1,
+                        "msg": "successfully found top 6 volunteers",
+                        "info": {
+                            "result": result
+                        }
+                    }
+                    res.end(JSON.stringify(data))
+                })
+
+            console.log("_______id_______", id)
+            console.log("_____________result__________", result)
+
+        })
+        .catch(err => {
+            console.log("___________________errr_____________-", err)
+            const data = {
+                "status": 0,
+                "msg": "Failed fetching the details of top 6 opportunities",
+                "info": err
+            }
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            res.end(JSON.stringify(data))
+        })
+        .catch(err => {
+            res.send(400, err)
+        })
+
+})
+
 
 /**
  * apply for the opportunity
@@ -1067,6 +1224,169 @@ router.put("/search/opportunity/location/lat_long", async function (req, res, ne
 
 
 });
+
+/**
+ * get opportunities based on user's age
+ */
+router.get("/:userId/opportunities_by_age", async function (req, res, next) {
+
+    console.log("\nInside the apply request of opportunity");
+
+    const userId = req.params.userId
+    // const opportunityId = req.body.opportunityId
+
+    UserInfo.findById(userId, { age: 1 })
+        .exec()
+        .then(result => {
+            var age = result.age
+            if (age < 25) {
+
+                Opportunity.find({
+                    $or: [{ cause: { $regex: "Communication", $options: 'i' } }, { cause: { $regex: "Education and Literacy", $options: 'i' } }]
+                })
+                    .exec()
+                    .then(res_user => {
+                        console.log("!!!!!!!!!!!!!!!!!!!!!!!res_user!!!!!!!!!!!!!", res_user)
+                        res.writeHead(200, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 1,
+                            "msg": "successfully found no of profile views of the user",
+                            "info": {
+                                "result": res_user
+                            }
+                        }
+                        // console.log("____________data_________________", data)
+                        res.end(JSON.stringify(data))
+                    })
+
+            } else {
+
+                Opportunity.find({
+                    $or: [{ cause: { $regex: "Animal", $options: 'i' } }, { cause: { $regex: "Children", $options: 'i' } }]
+                })
+                    .exec()
+                    .then(res_user => {
+                        console.log("!!!!!!!!!!!!!!!!!!!!!!!res_user!!!!!!!!!!!!!", res_user)
+                        res.writeHead(200, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 1,
+                            "msg": "successfully found no of profile views of the user",
+                            "info": {
+                                "result": res_user
+                            }
+                        }
+                        // console.log("____________data_________________", data)
+                        res.end(JSON.stringify(data))
+                    })
+            }
+
+        })
+        .catch(err => {
+
+            const data = {
+                "status": 0,
+                "msg": "Failed fetching the no of views of the user",
+                "info": err
+            }
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            res.end(JSON.stringify(data))
+            console.log("______err__________", err)
+        })
+
+
+
+
+});
+
+/**
+ * get oppoertunities based on gender
+ */
+router.get("/:userId/opportunities_by_gender", async function (req, res, next) {
+
+    console.log("\nInside the apply request of opportunity");
+
+    const userId = req.params.userId
+    // const opportunityId = req.body.opportunityId
+
+    UserInfo.findById(userId, { gender: 1 })
+        .exec()
+        .then(result => {
+            var gender = result.gender
+            if (gender == "Male") {
+
+                Opportunity.find({
+                    $or: [{ cause: { $regex: "Communication", $options: 'i' } }, { cause: { $regex: "Education and Literacy", $options: 'i' } }]
+                })
+                    .exec()
+                    .then(res_user => {
+                        console.log("!!!!!!!!!!!!!!!!!!!!!!!res_user!!!!!!!!!!!!!", res_user)
+                        res.writeHead(200, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 1,
+                            "msg": "successfully found no of profile views of the user",
+                            "info": {
+                                "result": res_user
+                            }
+                        }
+                        // console.log("____________data_________________", data)
+                        res.end(JSON.stringify(data))
+                    })
+
+            } else {
+
+                Opportunity.find({
+                    $or: [{ cause: { $regex: "Animal", $options: 'i' } }, { cause: { $regex: "Children", $options: 'i' } }]
+                })
+                    .exec()
+                    .then(res_user => {
+                        console.log("!!!!!!!!!!!!!!!!!!!!!!!res_user!!!!!!!!!!!!!", res_user)
+                        res.writeHead(200, {
+                            'Content-Type': 'application/json'
+                        })
+                        const data = {
+                            "status": 1,
+                            "msg": "successfully found no of profile views of the user",
+                            "info": {
+                                "result": res_user
+                            }
+                        }
+                        // console.log("____________data_________________", data)
+                        res.end(JSON.stringify(data))
+                    })
+            }
+
+        })
+        .catch(err => {
+
+            const data = {
+                "status": 0,
+                "msg": "Failed fetching the no of views of the user",
+                "info": err
+            }
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            res.end(JSON.stringify(data))
+            console.log("______err__________", err)
+        })
+
+
+
+
+});
+
+
+/**get the opportunities from the array of ids */
+
+
 
 
 
