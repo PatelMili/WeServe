@@ -856,6 +856,7 @@ router.put("/search/opportunity/location", async function (req, res, next) {
 router.get('/top_rated/opportunities', function (req, res) {
     console.log("inside the get top 6 opportunities")
 
+
     Opportunity.aggregate([
         { $match: { rating: { $gte: 2 } } },
         { $sort: { rating: 1 } },
@@ -1128,6 +1129,13 @@ router.get('/:opportunityId/opportunity_detail', function (req, res) {
 
 /**
  * search the opportunity by location
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  */
 router.put("/search/opportunity/location/lat_long", async function (req, res, next) {
 
@@ -1137,9 +1145,23 @@ router.put("/search/opportunity/location/lat_long", async function (req, res, ne
     var place2 = {};
     const lat = req.body.lat;
     const long = req.body.long;
-    place2 = {
-        lat: lat,
-        long: long
+   
+    
+    if (lat == 0 || long== 0) {
+        getCoords('San Jose')
+            .then((coords) => {
+                console.log(coords);
+                lat = coords.lat,
+                    long = coords.lng
+                    place2={
+                        lat:lat,
+                        long:long
+                       
+                    }
+            })
+    }
+    else {
+
     }
     Opportunity.find().exec()
         .then((result_o, err) => {
@@ -1152,16 +1174,8 @@ router.put("/search/opportunity/location/lat_long", async function (req, res, ne
             //place1 is from data base, place2 if of user 
             if (!result_o.length == 0) {
                 var i = 0;
-                var loc;
                 let place1 = {};
                 var resultArr = [];
-                var distance_arr = [];
-                var places_arr = [];
-                var latt, longg, dist;
-                var k;
-                var flag;
-
-
                 for (i = 0; i < result_o.length; i++) {
                     loc = result_o[i].location;
                     place1 = {
