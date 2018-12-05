@@ -1,0 +1,7 @@
+.logoSize{
+    width: 30%;
+    height: 20%;
+}
+.nav>li {
+    display: inline-block;
+}
