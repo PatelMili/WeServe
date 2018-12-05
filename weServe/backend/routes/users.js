@@ -187,7 +187,7 @@ router.put('/:userId/profile_information', async function (req, res, next) {
     const profession=req.body.profession
     const interested_in=req.body.interested_in
     const causes=req.body.causes
-    const skills= req.body.skills
+    const skill= req.body.skills
     const languages=req.body.languages
     const hear_about_us=req.body.hear_about_us
 
@@ -204,15 +204,10 @@ router.put('/:userId/profile_information', async function (req, res, next) {
             profession: profession,
             interested_in: interested_in,
             causes: causes,
-           // skills : skills,
+            skills : skill,
             languages : languages,
             hear_about_us:hear_about_us,
             mobile_no:mobile_no
-        },
-    $push: {
-            "skills": {
-                "$each": req.body.skills
-            }
         }
     }, function (err, result) {
         if (err) {
