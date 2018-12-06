@@ -124,7 +124,7 @@ router.post('/ngo/signup', async function (req, res, next) {
         fname: fname,
         lname: lname,
         city: city,
-        cause: cause,
+        causes: cause,
         organisation_name: organisation_name,
         contact_person: contact_person,
         description: description,
@@ -474,12 +474,13 @@ router.put('/:userId/ngo_profile_information', async function (req, res, next) {
 /**
  * get ngo details
  */
-router.get('/:userId/ngo_detail', function (req, res) {
+router.put('/ngo_detail', function (req, res) {
     console.log("inside the get request for ngo details")
 
-    const userId = req.params.userId
-    console.log("_________userId___________", userId)
-    UserInfo.findById(userId)
+    const organisation_name = req.body.organisation_name
+    console.log("_________organisation_name___________", organisation_name)
+    UserInfo.find({ organisation_name: organisation_name })
+        .populate('opportunities_posted')
         .then(userInfo => {
             res.writeHead(200, {
                 'Content-Type': 'application/json'
@@ -520,6 +521,7 @@ router.get('/:userId/volunteer_detail', function (req, res) {
     console.log("_________userId___________", userId)
 
     UserInfo.findById(userId)
+        .populate('opportunities_enrolled')
         .then(userInfo => {
             res.writeHead(200, {
                 'Content-Type': 'application/json'
@@ -1565,8 +1567,108 @@ router.get("/:userId/opportunities_by_gender", async function (req, res, next) {
 });
 
 
-/**get the opportunities from the array of ids */
+/**
+ * get volunteer's based on the causes they support*/
+router.put("/search/volunteer/causes", async function (req, res, next) {
+    var causes1 = req.body.causes;
+    console.log("___________causes___________", causes1)
+    UserInfo.find({
+        $and: [{ type: "V" }, { causes: { $regex: causes1, $options: 'i' } }]
 
+    })
+
+        .populate('opportunities_enrolled')
+
+        .then(res_user => {
+            console.log("!!!!!!!!!!!!!!!!!!!!!!!res_user!!!!!!!!!!!!!", res_user)
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 1,
+                "msg": "successfully found no of profile views of the user",
+                "info": {
+                    "result": res_user
+                }
+            }
+            // console.log("____________data_________________", data)
+            res.end(JSON.stringify(data))
+        })
+
+
+});
+
+
+
+
+
+/**get the recommendations from the array of ids */
+router.get("/recommendations", async function (req, res, next) {
+
+    console.log("\nInside the get recommendations");
+    var id = [];
+
+    Opportunity.find({ "_id": { "$in": id } })
+        // .populate('applicants')
+        .exec()
+        .then(result => {
+            console.log("~~~~~~~~~~result~~~~~~~~~~````", JSON.stringify(result))
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 1,
+                "msg": "successfully found top 6 volunteers",
+                "info": {
+                    "result": result,
+                    
+                }
+            }
+            res.end(JSON.stringify(data))
+        })
+
+
+});
+
+/**
+ * get ngo's based on the causes they support*/
+
+router.put("/search/ngo/causes", async function (req, res, next) {
+    var causes1 = req.body.causes;
+    console.log("___________causes___________", causes1)
+    //
+    // db.inventory.find( { $and: [ { price: { $ne: 1.99 } }, { price: { $exists: true } } ] } )
+    UserInfo.find({
+        $and: [{ type: "N" }, { causes: { $regex: causes1, $options: 'i' } }]
+        // $and: [{ causes: { $regex: causes1, $options: 'i' } }]
+    })
+
+
+
+        // UserInfo.find({type:"N"},{ causes: { $regex: causes1, $options: 'i' } },{
+        //     // $and: [{ causes: { $regex: causes1, $options: 'i' } }]
+        // })
+
+        .populate('opportunities_posted')
+
+        .then(res_user => {
+            console.log("!!!!!!!!!!!!!!!!!!!!!!!res_user!!!!!!!!!!!!!", res_user)
+            res.writeHead(200, {
+                'Content-Type': 'application/json'
+            })
+            const data = {
+                "status": 1,
+                "msg": "successfully found no of profile views of the user",
+                "info": {
+                    "result": res_user
+                }
+            }
+            // console.log("____________data_________________", data)
+            res.end(JSON.stringify(data))
+        })
+
+
+});
 
 
 
