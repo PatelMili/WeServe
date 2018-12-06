@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 
 
 //import '../travelerLogin/travelerLogin.css';
-/*import axios from 'axios';
-import cookie from 'react-cookies';
+import axios from 'axios'; 
 import { Link } from 'react-router-dom';
-import { Redirect } from 'react-router';*/
+import { Redirect } from 'react-router';
+
+import { ROOT_URL } from '../constants/constants';
 
 import Navbar from '../components/navbar';
 import homePageBackground from '../assets/images/homePageBackground.jpg';
@@ -30,31 +31,51 @@ class homePage extends Component {
         } 
 
         this.state = {
-            opportunityResults: people, 
-            handleOpportunity:""
-            /* clickedUser:"Lauren Miller",
-             clickedUserDetails:"Amazon Recruiter"*/
-        }
-        /*this.handleCreateNewMesage = this.handleCreateNewMesage.bind(this);
-        this.handleClickedViewMsg = this.handleClickedViewMsg.bind(this);*/
+            opportunityResults: [], 
+            handleOpportunity:"" 
+        } 
         this.handleOpportunity = this.handleOpportunity.bind(this);
+        this.go = this.go.bind(this);
     }
 
-    handleOpportunity = () => {
-        /*this.setState({
-            createMsgFlag : false
-        });*/
+    handleOpportunity = (e) => {
+        this.setState({
+            handleOpportunity: e.target.value
+        })
+    } 
+    go = () => {
+         
+        console.log("-------------------------"+this.state.handleOpportunity);
+        let data = {
+            causes: this.state.handleOpportunity
+        } 
+
+        axios.put(`${ROOT_URL}/user/search/ngo/causes`, data, { withCredentials: true })
+            .then(response => {
+                console.log("Received data"+JSON.stringify(response.data.info.result.length))
+
+               // console.log("Received data"+JSON.stringify(response.data.info.result[0].opportunities_posted))
+               if(response.data.info.result.length>0)
+               { if (response.data) {
+                    if (response.data.status === 1) {
+                         console.log(response)  
+                          
+                        this.setState({
+                            opportunityResults: response.data.info.result[0].opportunities_posted
+                        })
+                        console.log("Fetched user details")
+
+                    } else if (response.data.status === 0) {
+                        alert("No data found. Try again");
+                    }
+                }
+            }
+            }, (error) => {
+                console.log(error)
+                alert("something went wrong, please try again!")
+            });
+
     }
-    /*  handleCreateNewMesage = () => {
-          this.setState({
-              createMsgFlag : true
-          });
-      }
-      handleClickedViewMsg = () => {
-          this.setState({
-              createMsgFlag : false
-          });
-      }*/
 
     render() {
         require('../styles/volunteerDashboard.css');
@@ -80,7 +101,7 @@ class homePage extends Component {
                                     <i class="icon ion-navigate ionIcon"></i>
                                 </div>
                                 <div class="col-sm-8 col-md-8 col-lg-8  ">
-                                    <div className="bottomPadding">{opportunity.start_date}-{opportunity.end_date} </div>
+                                    <div className="bottomPadding">{opportunity.start_date.slice(0,10)} to {opportunity.end_date.slice(0,10)} </div>
                                     <div className="bottomPadding">{opportunity.hrs}hrs/week</div>
                                     <div >{opportunity.location} </div>
                                 </div>
@@ -120,7 +141,7 @@ class homePage extends Component {
                        
                     </select>
 
-                    <button type="submit" className="mybutton">GO</button>
+                    <button type="submit" className="mybutton" onClick={this.go} >GO</button>
                     <br></br><br></br>
                     {DisplayMsgList}
                     <br></br><br></br>

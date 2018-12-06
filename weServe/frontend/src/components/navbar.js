@@ -14,11 +14,13 @@ class navbar extends Component {
         this.state = {
             handelOpportunity: "",
             nextPage: false,
-            nextPage1: false
+            nextPage1: false,
+            redirect: false
         }
         this.handleLogout = this.handleLogout.bind(this);
         this.nextPage = this.nextPage.bind(this);
         this.nextPage1 = this.nextPage1.bind(this);
+        this.logout = this.logout.bind(this)
 
     }
     //handle logout to destroy the cookie
@@ -36,6 +38,13 @@ class navbar extends Component {
             nextPage1: true
         })
         console.log(this.state.nextPage1);
+    }
+
+    logout() {
+        localStorage.clear();
+        this.setState({
+            redirect: true
+        })
     }
     render() {
         var fname = localStorage.getItem("ownerEmailNavbar");
@@ -58,6 +67,35 @@ class navbar extends Component {
             <div></div>
         )
 
+        let newCom;
+        if (!localStorage.getItem('myData')) {
+            newCom = <li className="dropdown headings  ">
+                <a href="" data-toggle="dropdown" className="dropdown-toggle navButton btn btn-info" role="button" id='noFocus'  >
+                    Login </a>
+                <ul className="dropdown-menu " style={{ left: "-58px" }}>
+
+                    <li style={{ padding: "10px", textAlign: "center" }}>
+                        <a style={{ color: "#7fc241" }} href="/login" className='Dropdown__menu Dropdown__menu--open Dropdown__menu--right' >Volunteer</a>
+                    </li>
+                    <li style={{ padding: "10px", textAlign: "center" }}>
+                        <a style={{ color: "#7fc241" }} href="/loginNGO" className='Dropdown__menu Dropdown__menu--open Dropdown__menu--right' >NGO</a>
+                    </li>
+                </ul>
+            </li>
+        } else {
+            newCom = <li className="dropdown headings  ">
+                <a href="/" onClick={this.logout} data-toggle="dropdown" className="navButton btn btn-info" role="button" id='noFocus'  >
+                    Logout </a>
+
+            </li>
+
+        }
+        // let redirectVar;
+        if (this.state.redirect) {
+            redirectVar = <Redirect to="/" />
+
+        }
+
         return (
 
             <div>
@@ -65,13 +103,13 @@ class navbar extends Component {
                 <nav className="navbar navbar-expand-sm">
                     <div className="container-fluid" style={{ marginTop: "0px" }}>
                         <div className="navbar-header">
-                            <img src={logo} className="logoSize" />
+                            <Link to='/'>   <img src={logo} className="logoSize" /></Link>
                         </div>
 
                         <ul className="nav navbar-nav navbar-right">
 
                             <li className="dropdown headings ">
-                                <a className="navHeader" href="#" id='noFocus' data-toggle="modal" data-target="#beA" >
+                                <a className="navHeader" href="/beaVolunteer" id='noFocus'  >
 
                                     Be a volunteer </a>
 
@@ -81,26 +119,14 @@ class navbar extends Component {
 
                             </li>
                             <li className="dropdown headings ">
-                                <a className="navHeader" href="#" id='noFocus' data-toggle="modal" data-target="#findA" >
+                                <a className="navHeader" href="/findaVolunteer" id='noFocus'  >
 
                                     Find a volunteer </a>
                                 {/* <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     {findAVolunteerModal}
                                 </div> */}
                             </li>
-                            <li className="dropdown headings  ">
-                                <a href="" data-toggle="dropdown" className="dropdown-toggle navButton btn btn-info" role="button" id='noFocus'  >
-                                    Login </a>
-                                <ul className="dropdown-menu " style={{ left: "-58px" }}>
-
-                                    <li style={{ padding: "10px", textAlign: "center" }}>
-                                        <a style={{ color: "#7fc241" }} href="/login" className='Dropdown__menu Dropdown__menu--open Dropdown__menu--right' >Volunteer</a>
-                                    </li>
-                                    <li style={{ padding: "10px", textAlign: "center" }}>
-                                        <a style={{ color: "#7fc241" }} href="/loginNGO" className='Dropdown__menu Dropdown__menu--open Dropdown__menu--right' >NGO</a>
-                                    </li>
-                                </ul>
-                            </li>
+                            {newCom}
 
 
                         </ul>
@@ -126,7 +152,7 @@ class navbar extends Component {
                                 </select>
                             </div>
                             <div class="modal-footer">
-                            <a href="/findaVolunteer" className="btn btn-default">Okay</a>
+                                <a href="/findaVolunteer" className="btn btn-default">Okay</a>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -152,7 +178,7 @@ class navbar extends Component {
                                 </select>
                             </div>
                             <div class="modal-footer">
-                            <a href="/beaVolunteer" className="btn btn-default">Okay</a>
+                                <a href="/beaVolunteer" className="btn btn-default">Okay</a>
 
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
@@ -164,9 +190,9 @@ class navbar extends Component {
 
 
 
-              
 
-                 </div>
+
+            </div>
         )
     }
 }

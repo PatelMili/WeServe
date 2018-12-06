@@ -25,14 +25,8 @@ var users= mongoose.model('Users',{
         required: true,
         unique:true
     },
-    mobile_no : {
-        type : String
-    },
     gender : {
         type : String
-    },
-    birthdate : {
-        type : Date
     },
     country : {
         type : String
@@ -40,23 +34,11 @@ var users= mongoose.model('Users',{
     city : {
         type : String
     },
-    profession : {
-        type : String
-    },
     interested_in : {
         type : String
     },
     causes : {
         type : Array
-    },
-    skills : {
-        type : Array
-    },
-    languages : {
-        type : Array
-    }, 
-    hear_about_us : {
-        type : String
     },
     organisation_name : {
         type : String
@@ -72,11 +54,16 @@ var users= mongoose.model('Users',{
     },
     vision : {
         type : String
+    },  
+    age:{
+        type:Number
     },
-    qb_id : {
-        type : String
+    lat:{
+        type:String
     },
-        
+    long:{
+        type:String
+    },
     opportunities_enrolled : [
         {
             type: mongoose.Schema.Types.ObjectId,

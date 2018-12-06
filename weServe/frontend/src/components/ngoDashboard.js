@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import { ROOT_URL } from '../constants/constants';
+import axios from 'axios';
 
 //import '../travelerLogin/travelerLogin.css';
 /*import axios from 'axios';
@@ -8,9 +10,6 @@ import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router';*/
 
 import Navbar from '../components/navbar';
-import homePageBackground from '../assets/images/homePageBackground.jpg';
-import homePageBackground2 from '../assets/images/homePageBackground2.jpg';
-import homePageBackground3 from '../assets/images/homePageBackground3.jpg';
 
 var Carousel = require('react-responsive-carousel').Carousel;
 
@@ -18,55 +17,77 @@ class homePage extends Component {
     constructor(props) {
         super(props);
 
-        const people = [];
-        for (let i = 0; i < 6; i++) {
-            people.push({
-                opp_name: "Chidren and Youth",
-                start_date: "Nov 2018",
-                end_date: "Jan 2019",
-                hrs: 5,
-                location: "Mumbai"
-            });
-        } 
-
-        const volunteer = [];
-        for (let i = 0; i < 6; i++) {
-            volunteer.push({
-                fname: "devanshi",
-                lname: "trivedi",
-                opportunities_enrolled: [{ opp_name: "opp1", opp_description: "desc1" }, { opp_name: "opp2", opp_description: "desc2" }],
-                causes: ["care", "enviornment"],
-                age: 25
-            });
-        }
-
         this.state = {
-            
-            volunteerResults: volunteer,
-            handleOpportunity:""
-            /* clickedUser:"Lauren Miller",
-             clickedUserDetails:"Amazon Recruiter"*/
+
+            volunteerResults: [],
+            handleOpportunity: ""
         }
-        /*this.handleCreateNewMesage = this.handleCreateNewMesage.bind(this);
-        this.handleClickedViewMsg = this.handleClickedViewMsg.bind(this);*/
         this.handleOpportunity = this.handleOpportunity.bind(this);
+        this.go = this.go.bind(this);
     }
 
-    handleOpportunity = () => {
-        /*this.setState({
-            createMsgFlag : false
-        });*/
+    handleOpportunity = (e) => {
+        this.setState({
+            handleOpportunity: e.target.value
+        })
+
     }
-    /*  handleCreateNewMesage = () => {
-          this.setState({
-              createMsgFlag : true
-          });
-      }
-      handleClickedViewMsg = () => {
-          this.setState({
-              createMsgFlag : false
-          });
-      }*/
+    go = () => {
+
+        console.log(this.state.handleOpportunity);
+        let data = {
+            causes: this.state.handleOpportunity
+        }
+
+        axios.put(`${ROOT_URL}/user/search/volunteer/causes`, data, { withCredentials: true })
+            .then(response => {
+                console.log("Received data" + JSON.stringify(response.data.info.result))
+                if (response.data) {
+                    if (response.data.status === 1) {
+                        console.log(response)
+                        this.setState({
+                            volunteerResults: response.data.info.result
+                        })
+                        console.log("Fetched user details")
+
+                    } else if (response.data.status === 0) {
+                        alert("No data found. Try again");
+                    }
+                }
+            }, (error) => {
+                console.log(error)
+                alert("something went wrong, please try again!")
+            });
+
+    }
+
+    componentDidMount() {
+        console.log(this.state.handleOpportunity);
+        let data = {
+            causes: this.state.handleOpportunity
+        }
+
+        axios.put(`${ROOT_URL}/user/search/volunteer/causes`, data, { withCredentials: true })
+            .then(response => {
+                console.log("Received data" + JSON.stringify(response.data.info.result))
+                if (response.data) {
+                    if (response.data.status === 1) {
+                        console.log(response)
+                        this.setState({
+                            volunteerResults: response.data.info.result
+                        })
+                        console.log("Fetched user details")
+
+                    } else if (response.data.status === 0) {
+                        alert("No data found. Try again");
+                    }
+                }
+            }, (error) => {
+                console.log(error)
+                alert("something went wrong, please try again!")
+            });
+    }
+
 
     render() {
         require('../styles/volunteerDashboard.css');
@@ -93,7 +114,7 @@ class homePage extends Component {
                                         <p key={index} className="leftpad">
                                             {cause}
                                         </p>
-                                    ))}  
+                                    ))}
                                 </div>
                             </div>
                             <p class=" fonts bottomPadding"><b>Age:</b> {volunteer.age} </p>
@@ -108,7 +129,7 @@ class homePage extends Component {
 
                                     <div class="modal-content">
                                         <div class="modal-body">
-                                            <h4 style={{color:"#7fc241"}}>{volunteer.fname} {volunteer.lname}</h4>
+                                            <h4 style={{ color: "#7fc241" }}>{volunteer.fname} {volunteer.lname}</h4>
                                             <p>The volunteer is interested in serving for various
                                                 causes like {volunteer.causes.map((cause, index) => (
                                                     <div key={index} >
@@ -153,7 +174,7 @@ class homePage extends Component {
                     <select onChange={this.handleOpportunity} class="form-control myWidth" id="sel1">
                         <option value="" >Select cause...</option>
                         <option value="Children and Youth" selected={this.state.handelOpportunity == "Children and Youth"}>Children and Youth</option>
-                        <option value="Education and Literacy" selected={this.state.handelOpportunity == "Education"}>Education</option>
+                        <option value="Education and Literacy" selected={this.state.handelOpportunity == "Education and Literacy"}>Education and Literacy</option>
                         <option value="Animals" selected={this.state.handelOpportunity == "Animals"}>Animals</option>
                         <option value="Community Development" selected={this.state.handelOpportunity == "Community Development"}>Community Development</option>
                         <option value="Enviornment" selected={this.state.handelOpportunity == "Enviornment"}>Enviornment</option>
@@ -161,10 +182,10 @@ class homePage extends Component {
                         <option value="Health and Medicine" selected={this.state.handelOpportunity == "Health and Medicine"}>Health and Medicine</option>
                         <option value="Advocacy and HR" selected={this.state.handelOpportunity == "Advocacy and HR"}>Advocacy and HR</option>
                         <option value="Specially Abled People" selected={this.state.handelOpportunity == "Specially Abled People"}>Specially Abled People</option>
-                       
+
                     </select>
 
-                    <button type="submit" className="mybutton">GO</button>
+                    <button type="submit" className="mybutton" onClick={this.go}>GO</button>
                     <br></br><br></br>
                     {userList}
                     <br></br><br></br>

@@ -80,7 +80,7 @@ class login extends Component {
                             this.setState({
                                 authFlag: true,
                                 invalidFlag: false,
-                                myData: test
+                                // myData: test
                             })
                         } else if (response.data.status === 0) {
                             this.setState({
@@ -222,8 +222,8 @@ class login extends Component {
             }
         }
 
-        if (this.state.myData) {
-            redirectVar = <Redirect to="/OwnerDashboard" />
+        if (this.state.authFlag) {
+            redirectVar = <Redirect to="/volunteerDashboard" />
         }
 
         return (

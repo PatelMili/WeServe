@@ -1,0 +1,125 @@
+.mysendButton{
+    border: none;
+    margin: 1%;
+    padding: 1%;
+    padding-left: 1%;
+    padding-right: 1%;
+    width: 30%;
+    background-color: #7fc241;
+    color: white;
+}
+.bottomPadding{
+    padding-bottom: 12px;
+}
+.leftpad{ 
+    padding-left: 20%;
+}
+
+.carousel-inner img {
+    width: 100%; 
+    height: 85vh;
+}
+.carousel-inner > .item {
+    position: relative;
+    display: none;
+    -webkit-transition: 0.6s ease-in-out left;
+    -moz-transition: 0.6s ease-in-out left;
+    -o-transition: 0.6s ease-in-out left;
+    transition: 0.6s ease-in-out left;
+}
+ 
+.glyColor{
+    color: black;
+}
+.flex-container>div{
+    text-align: left !important;
+    line-height: 30px !important;
+}
+.noPadding{
+    line-height: 0px;
+}
+
+.ionIcon{
+    font-size: 35px;
+    padding-left: 20px;
+}
+.firstheight{
+    padding: 2%; 
+}
+.secondheight{
+    padding: 2%; 
+}
+.thirdheight{
+    padding: 2%; 
+    text-align: center;
+}
+.fonts{
+    font-size: 15px;
+}
+
+.myWidth{
+    margin-left: 40%;
+    width: 20%;
+}
+.mybutton{ 
+
+    border: none;
+    margin: 1%; 
+    padding: 0.5%;
+    padding-left: 1%;
+    padding-right: 1%;
+    width: 10%;
+    background-color: #7fc241;
+    color: white;
+}
+.imageHeight{
+    position: relative;
+    text-align: center;
+}
+
+.joinUsButton{
+    color: black;
+    background-color: #7fc241cc;
+    border: none;
+    width: 25%;
+    height: 6vh;
+    text-align: center; 
+}
+
+.greyBackground{
+    text-align: center;
+    align-content: center;
+    height:200vh;
+    background-color: #76ab445c;
+}
+
+.searchText{
+    width: 25%;
+    font-size: 20px;
+}
+.searchButton{
+    width: 5%;
+    height: 35px;
+    margin: 1%;
+    border: none;
+}
+.textCenter{
+    text-align: center; 
+    font-family: serif;
+    align-content: center;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center; 
+  }
+  .flex-container > div {
+    background-color: white;
+    border: 1px solid lightgrey;
+    width: 30%; 
+    margin: 10px;
+    text-align: center;
+    line-height: 75px;
+ 
+  }

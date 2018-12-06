@@ -90,7 +90,7 @@ class signUp extends Component {
     handleCause = (e) => {
         console.log(e.target.value);
         this.setState({
-            interested_in: e.target.value
+            handleCause: e.target.value
         })
     }
 
